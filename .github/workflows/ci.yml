@@ -8,6 +8,10 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13", "3.14"]
     services:
       postgres:
         image: postgres:15-alpine
@@ -23,10 +27,11 @@ jobs:
           --health-timeout 5s
           --health-retries 5
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v5
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v8.2.0
+        with:
+          python-version: ${{ matrix.python-version }}
       - run: uv sync --all-extras
-      - run: uv run ruff check dalembic tests
       - run: uv run pytest tests/unit -q
       - run: uv run pytest tests/integration -q
         env:
