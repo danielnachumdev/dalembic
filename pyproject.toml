@@ -9,6 +9,7 @@ description = "Branch-aware Alembic deployment: STG downgrade-to-main, prod upgr
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
+authors = [{ name = "Daniel Nachum", email = "danielnachumdev@gmail.com" }]
 keywords = ["alembic", "migrations", "database", "deploy", "postgresql"]
 dependencies = [
     "alembic>=1.13",
@@ -20,6 +21,9 @@ dependencies = [
 dev = [
     "pytest>=8.0",
     "ruff>=0.8",
+    "quickpub>=4.0",
+    "twine>=6.0",
+    "setuptools>=61.0",
 ]
 
 [project.scripts]

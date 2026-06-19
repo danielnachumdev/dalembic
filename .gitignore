@@ -6,5 +6,10 @@ __pycache__/
 .ruff_cache/
 dist/
 *.egg-info/
+quickpub.egg-info/
+setup.py
+MANIFEST.in
+.pypirc
+.pyproject.toml.bak
 .coverage
 htmlcov/
