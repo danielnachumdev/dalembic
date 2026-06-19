@@ -1,0 +1,38 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_DB: dalembic_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 2s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - run: uv sync --all-extras
+      - run: uv run ruff check dalembic tests
+      - run: uv run pytest tests/unit -q
+      - run: uv run pytest tests/integration -q
+        env:
+          DB_HOST: localhost
+          DB_PORT: "5433"
+          DB_NAME: dalembic_test
+          DB_USER: postgres
+          DB_PASSWORD: postgres
+          DB_SCHEMA: public
