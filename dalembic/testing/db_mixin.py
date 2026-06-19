@@ -6,6 +6,8 @@ import os
 from sqlalchemy import create_engine, text
 from sqlalchemy.engine import Engine
 
+from dalembic.dalembic_state import TABLE_NAME
+
 logger = logging.getLogger(__name__)
 
 
@@ -27,7 +29,7 @@ class DbMixin:
     def assert_stamped_sha(self, expected_sha: str) -> None:
         actual = self._get_stamped_sha()
         assert actual == expected_sha, f"expected SHA {expected_sha}, got {actual}"
-        logger.info("Verified: app_state stamped with %s", expected_sha)
+        logger.info("Verified: dalembic_state stamped with %s", expected_sha)
 
     def assert_column_exists(self, table_name: str, column_name: str) -> None:
         assert self._column_exists(table_name, column_name), f"{table_name}.{column_name} should exist"
@@ -111,7 +113,7 @@ class DbMixin:
     def _get_stamped_sha(self) -> str | None:
         with self._db_engine.connect() as conn:
             row = conn.execute(
-                text(f"SELECT data->>:key FROM {self._schema}.app_state WHERE id = 'current'"),
+                text(f"SELECT data->>:key FROM {self._schema}.{TABLE_NAME} WHERE id = 'current'"),
                 {"key": self._state_key},
             ).fetchone()
             return row[0] if row else None

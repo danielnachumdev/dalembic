@@ -15,7 +15,7 @@ Stable exports from `dalembic/__init__.py`:
 - `DeploySettings` — configuration dataclass + `from_env()`
 - `DeploymentManager` — STG/PROD deploy orchestration
 - `MigrationArchive` — git archive of prior commit migrations
-- `StateStore` — Postgres JSONB deploy SHA storage (STG)
+- `DalembicState` — Postgres JSONB deploy SHA storage in `dalembic_state` (STG)
 - `revert_to` — programmatic revert via `downgrade()` chain
 
 Additional public modules:
@@ -48,7 +48,7 @@ Integration tests copy `tests/fixtures/taskboard_app/` into a temp git repo — 
 STG deploy semantics:
 
 1. Require `CI_COMMIT_SHA` + `ALEMBIC_HEAD_REVISION_MAIN`
-2. Read previous SHA from `StateStore`
+2. Read previous SHA from `DalembicState`
 3. If reachable → archive prior migrations → downgrade to main head
 4. Upgrade to branch head
 5. Stamp commit SHA
@@ -59,7 +59,7 @@ STG deploy semantics:
 - Python `>=3.11`, line length 120
 - All migration paths/schema via `DeploySettings` — no static global config
 - Consumer migrations: `from dalembic.revert import revert_to`
-- Postgres required for `StateStore` (JSONB)
+- Postgres required for `DalembicState` (`dalembic_state` table, JSONB)
 - Revision IDs: zero-padded numeric strings (`0001`, `0002`, …) for string comparison in downgrade skip logic
 
 ## Contributing

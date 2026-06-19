@@ -22,7 +22,6 @@ class DeploySettings:
     migrations_subpath: str = "migrations"
     versions_subpath: str = "versions"
     state_key: str = "deploy_commit_sha"
-    state_table: str = "app_state"
     state_row_id: str = "current"
     commit_sha: str | None = None
     main_head_revision: str | None = None

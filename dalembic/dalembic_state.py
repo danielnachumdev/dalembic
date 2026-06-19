@@ -10,27 +10,28 @@ from dalembic.settings import DeploySettings
 
 logger = logging.getLogger(__name__)
 
+TABLE_NAME = "dalembic_state"
 
-class StateStore:
-    """Key-value deploy metadata in a Postgres JSONB singleton row."""
+
+class DalembicState:
+    """Deploy metadata in a Postgres JSONB singleton row (`dalembic_state` table)."""
 
     def __init__(self, settings: DeploySettings) -> None:
         self._settings = settings
         self._connection = DatabaseConnection(settings)
         self._engine = self._connection.create_engine()
-        self._table = f"{settings.schema}.{settings.state_table}"
+        self._table = f"{settings.schema}.{TABLE_NAME}"
         self._ensure_table()
 
     def _ensure_table(self) -> None:
         schema = self._settings.schema
-        table = self._settings.state_table
         row_id = self._settings.state_row_id
         with self._engine.begin() as conn:
             conn.execute(text(f"CREATE SCHEMA IF NOT EXISTS {schema}"))
             conn.execute(
                 text(
                     f"""
-                CREATE TABLE IF NOT EXISTS {schema}.{table} (
+                CREATE TABLE IF NOT EXISTS {schema}.{TABLE_NAME} (
                     id TEXT PRIMARY KEY,
                     data JSONB NOT NULL DEFAULT '{{}}'::jsonb,
                     updated_at TIMESTAMP DEFAULT NOW()
@@ -41,7 +42,7 @@ class StateStore:
             conn.execute(
                 text(
                     f"""
-                INSERT INTO {schema}.{table} (id, data) VALUES (:id, '{{}}'::jsonb)
+                INSERT INTO {schema}.{TABLE_NAME} (id, data) VALUES (:id, '{{}}'::jsonb)
                 ON CONFLICT (id) DO NOTHING
             """
                 ),

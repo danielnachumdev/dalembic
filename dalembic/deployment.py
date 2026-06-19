@@ -5,8 +5,8 @@ import subprocess
 
 from dalembic.archive import MigrationArchive
 from dalembic.connection import DatabaseConnection
+from dalembic.dalembic_state import DalembicState
 from dalembic.settings import DeploySettings
-from dalembic.state_store import StateStore
 
 logger = logging.getLogger(__name__)
 
@@ -17,7 +17,7 @@ class DeploymentManager:
     def __init__(self, settings: DeploySettings) -> None:
         self._settings = settings
         self._connection = DatabaseConnection(settings)
-        self._state = StateStore(settings) if settings.env == "stg" else None
+        self._dalembic_state = DalembicState(settings) if settings.env == "stg" else None
 
     def deploy(self) -> None:
         if self._settings.env == "stg":
@@ -36,8 +36,8 @@ class DeploymentManager:
         if not self._settings.commit_sha or not self._settings.main_head_revision:
             raise RuntimeError("CI_COMMIT_SHA and ALEMBIC_HEAD_REVISION_MAIN are required for STG deploys")
 
-        assert self._state is not None
-        prev_sha = self._state.get(self._settings.state_key)
+        assert self._dalembic_state is not None
+        prev_sha = self._dalembic_state.get(self._settings.state_key)
         logger.info(
             "Current SHA: %s, previous STG SHA: %s",
             self._settings.commit_sha,
@@ -101,9 +101,9 @@ class DeploymentManager:
         self._run(["alembic", "upgrade", "head"], cwd=str(self._settings.repo_root))
 
     def _stamp_sha(self, sha: str) -> None:
-        assert self._state is not None
-        self._state.set(self._settings.state_key, sha)
-        logger.info("Stamped app_state with SHA %s.", sha)
+        assert self._dalembic_state is not None
+        self._dalembic_state.set(self._settings.state_key, sha)
+        logger.info("Stamped dalembic_state with SHA %s.", sha)
 
     def _stamp_revision(self, revision: str) -> None:
         logger.info("Stamping alembic_version to %s (ALEMBIC_REVERT_STAMP override).", revision)
