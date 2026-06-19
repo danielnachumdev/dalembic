@@ -120,10 +120,12 @@ upgrade_head(Path("alembic.ini"))
 
 ```bash
 uv sync --all-extras
-docker compose up -d db
+docker compose up -d
 uv run pytest tests/unit -q
 uv run pytest tests/integration -q
 ```
+
+**pgAdmin:** http://localhost:5050 — login `admin@admin.com` / `admin`. The `dalembic-test` server is pre-configured (password via `pgadmin-pgpass`, no per-connection prompt).
 
 ## License
 

@@ -37,7 +37,7 @@ uv run ruff check dalembic tests
 uv run pytest tests/unit -q
 
 # Integration (Postgres on :5433)
-docker compose up -d db
+docker compose up -d
 uv run pytest tests/integration -q
 ```
 

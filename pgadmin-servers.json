@@ -1,0 +1,14 @@
+{
+  "Servers": {
+    "1": {
+      "Name": "dalembic-test",
+      "Group": "Servers",
+      "Host": "db",
+      "Port": 5432,
+      "MaintenanceDB": "dalembic_test",
+      "Username": "postgres",
+      "PassFile": "/tmp/pgpass",
+      "SSLMode": "prefer"
+    }
+  }
+}

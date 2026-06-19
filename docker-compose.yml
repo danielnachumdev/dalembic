@@ -1,3 +1,5 @@
+name: dalembic
+
 services:
   db:
     image: postgres:15-alpine
@@ -12,3 +14,20 @@ services:
       interval: 2s
       timeout: 5s
       retries: 5
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
+    ports:
+      - "5050:80"
+    depends_on:
+      db:
+        condition: service_healthy
+    entrypoint: /bin/sh -c "cp /tmp/pgpass-mount /tmp/pgpass && chmod 0600 /tmp/pgpass && /entrypoint.sh"
+    volumes:
+      - ./pgadmin-servers.json:/pgadmin4/servers.json
+      - ./pgadmin-pgpass:/tmp/pgpass-mount:ro
